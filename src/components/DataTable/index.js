@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   generateMockAirlineData,
   getFlightStatus,
@@ -8,41 +8,74 @@ const DataTable = () => {
   const [flightDetailsList, setFlightDetailsList] = useState([]);
   const [copyFlightDetailsList, setCopyFlightDeatilsList] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
-  const [endIndex, setEndIndex] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [searchText, setSearchText] = useState("");
+
+  const previousButtonRef = useRef(null);
+  const nextButtonRef = useRef(null);
+
   useEffect(() => {
     const airlineData = generateMockAirlineData(100);
-    console.log(airlineData);
     setFlightDetailsList([...airlineData]);
     setCopyFlightDeatilsList([...airlineData]);
   }, []);
 
-  //handle item change
+  useEffect(() => {
+    // Disable previous button if startIndex is 0
+    if (startIndex === 0) {
+      previousButtonRef.current.disabled = true;
+      previousButtonRef.current.style.cursor = "not-allowed";
+    } else {
+      previousButtonRef.current.disabled = false;
+      previousButtonRef.current.style.cursor = "pointer";
+    }
+
+    // Disable next button if endIndex is greater than or equal to flightDetailsList length
+    if (startIndex + itemsPerPage >= flightDetailsList.length) {
+      nextButtonRef.current.disabled = true;
+      nextButtonRef.current.style.cursor = "not-allowed";
+    } else {
+      nextButtonRef.current.disabled = false;
+      nextButtonRef.current.style.cursor = "pointer";
+    }
+  }, [startIndex, itemsPerPage, flightDetailsList]);
+
+  // Handle item change
   const handleItemChange = (quantity) => {
-    setEndIndex(quantity);
+    setItemsPerPage(parseInt(quantity, 10));
+    setStartIndex(0); // Reset to the first page
   };
 
-  //search text change
+  // Handle search text change
   const handleSearchChange = (searchText) => {
     setSearchText(searchText);
   };
 
-  //search click
+  // Handle search click
   const handleSearchClick = () => {
-    const searchData = copyFlightDetailsList.filter((flightDetails) => {
-      return flightDetails.flightNumber.includes(searchText);
-    });
+    const searchData = copyFlightDetailsList.filter((flightDetails) =>
+      flightDetails.flightNumber.includes(searchText)
+    );
     setFlightDetailsList([...searchData]);
+    setStartIndex(0);
   };
 
-  //handle next button click
-  const handleNextClick=()=>{
-    console.log("next button clicked")
-  }
-  //handle previous button click
-  const hanldePreviousClick=()=>{
-    console.log("previous button clicked");
-  }
+  // Handle next button click
+  const handleNextClick = () => {
+    if (startIndex + itemsPerPage < flightDetailsList.length) {
+      setStartIndex((prevStartIndex) => prevStartIndex + itemsPerPage);
+    }
+  };
+
+  // Handle previous button click
+  const handlePreviousClick = () => {
+    if (startIndex > 0) {
+      setStartIndex((prevStartIndex) =>
+        Math.max(0, prevStartIndex - itemsPerPage)
+      );
+    }
+  };
+
   return (
     <div className="w-screen h-screen bg-purple-500 flex flex-col">
       <div className="w-1/2 h-10vh my-2 mx-auto">
@@ -95,7 +128,7 @@ const DataTable = () => {
             <tbody>
               {flightDetailsList.length ? (
                 flightDetailsList
-                  .slice(startIndex, endIndex)
+                  .slice(startIndex, startIndex + itemsPerPage)
                   .map((flightDetail, index) => (
                     <tr key={index}>
                       <td className="mx-2 my-1 px-2 py-1 border-b border-orange-100">
@@ -117,7 +150,7 @@ const DataTable = () => {
                   ))
               ) : (
                 <tr>
-                  <td colSpan={5}> 
+                  <td colSpan={5}>
                     <p className="text-center m-auto font-bold">No Data Found</p>
                   </td>
                 </tr>
@@ -147,12 +180,16 @@ const DataTable = () => {
             <button
               id="previousPage"
               className="bg-purple-500 text-white p-2 rounded-md mx-1"
+              onClick={handlePreviousClick}
+              ref={previousButtonRef}
             >
               {"<"}
             </button>
             <button
               id="nextPage"
               className="bg-purple-500 text-white p-2 rounded-md mx-1"
+              onClick={handleNextClick}
+              ref={nextButtonRef}
             >
               {">"}
             </button>
