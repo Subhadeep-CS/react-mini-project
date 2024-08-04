@@ -1,68 +1,141 @@
 import { useEffect, useState } from "react";
-import generateMockAirlineData from "../../helper/mockDataGenerator";
+import {
+  generateMockAirlineData,
+  getFlightStatus,
+} from "../../helper/DataTableHelper";
+
 const DataTable = () => {
-    const [flighDetailsList,setFlightDetailsList]=useState([]);
-    useEffect(()=>{
-        const airlineData=generateMockAirlineData(100);
-        console.log(airlineData);
-        setFlightDetailsList([...airlineData]);
-    },[])
+  const [flightDetailsList, setFlightDetailsList] = useState([]);
+  const [copyFlightDetailsList, setCopyFlightDeatilsList] = useState([]);
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(5);
+  const [searchText, setSearchText] = useState("");
+  useEffect(() => {
+    const airlineData = generateMockAirlineData(100);
+    console.log(airlineData);
+    setFlightDetailsList([...airlineData]);
+    setCopyFlightDeatilsList([...airlineData]);
+  }, []);
+
+  //handle item change
+  const handleItemChange = (quantity) => {
+    setEndIndex(quantity);
+  };
+
+  //search text change
+  const handleSearchChange = (searchText) => {
+    setSearchText(searchText);
+  };
+
+  //search click
+  const handleSearchClick = () => {
+    const searchData = copyFlightDetailsList.filter((flightDetails) => {
+      return flightDetails.flightNumber.includes(searchText);
+    });
+    setFlightDetailsList([...searchData]);
+  };
+
+  //handle next button click
+  const handleNextClick=()=>{
+    console.log("next button clicked")
+  }
+  //handle previous button click
+  const hanldePreviousClick=()=>{
+    console.log("previous button clicked");
+  }
   return (
-    <div id="rootDiv" className="w-screen h-screen bg-purple-500 flex flex-col">
-      <div id="datatableHeader" className="w-[50vw] h-[10vh] my-2 mx-auto">
-        <p className="text-black text-5xl text-bold align-center">
+    <div className="w-screen h-screen bg-purple-500 flex flex-col">
+      <div className="w-1/2 h-10vh my-2 mx-auto">
+        <p className="text-black text-5xl font-bold text-center">
           Flight Information Table
         </p>
       </div>
-      <div
-        id="datatable"
-        className="w-[80vw] h-[80vh] bg-white my-2 mx-auto rounded-lg flex flex-col"
-      >
-        <div id="data-table-header" className="m-2 p-2">
-          <p className="text-xl text-bold p-1">Airplanes Details</p>
+      <div className="w-4/5 h-4/5 bg-white my-2 mx-auto rounded-lg flex flex-col resize-y overflow-auto">
+        <div className="m-2 p-2">
+          <p className="text-xl font-bold p-1">Airplanes Details</p>
         </div>
-        <div id="searchBar" className="mx-2 p-2">
+        <div className="mx-2 p-2">
           <input
             type="text"
             name="text"
             id="searchText"
             placeholder="Enter flight Number"
             className="border-2 border-black rounded-md outline-black m-1 p-1"
+            value={searchText}
+            onChange={(e) => handleSearchChange(e.target.value)}
           />
-          <button className="bg-purple-500 m-1 p-1 w-20 text-white border-white border-2 rounded-md cursor-pointer">Search</button>
+          <button
+            className="bg-purple-500 m-1 p-1 w-20 text-white border-white border-2 rounded-md cursor-pointer"
+            onClick={handleSearchClick}
+          >
+            Search
+          </button>
         </div>
-        <div id="table" className="mx-auto">
+        <div className="mx-auto resize-y overflow-auto">
           <table className="mx-auto my-2">
             <thead className="bg-gray-400">
               <tr>
-                <th className="mx-2 my-1 px-2 py-1 text-center border-b-orange-100">Flight Number</th>
-                <th className="mx-2 my-1 px-2 py-1 text-center border-b-orange-100">Airplane</th>
-                <th className="mx-2 my-1 px-2 py-1 text-center border-b-orange-100">Airline</th>
-                <th className="mx-2 my-1 px-2 py-1 text-center border-b-orange-100">Airport</th>
-                <th className="mx-2 my-1 px-2 py-1 text-center border-b-orange-100">Status</th>
+                <th className="mx-2 my-1 px-2 py-1 text-center border-b border-orange-100">
+                  Flight Number
+                </th>
+                <th className="mx-2 my-1 px-2 py-1 text-center border-b border-orange-100">
+                  Airplane
+                </th>
+                <th className="mx-2 my-1 px-2 py-1 text-center border-b border-orange-100">
+                  Airline
+                </th>
+                <th className="mx-2 my-1 px-2 py-1 text-center border-b border-orange-100">
+                  Airport
+                </th>
+                <th className="mx-2 my-1 px-2 py-1 text-center border-b border-orange-100">
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody>
-                {/* list all the data by default set to 10 */}
-                {
-                    flighDetailsList.slice(0,5).map((flightDetail,index)=>{
-                        return(
-                            <tr>
-                                <td className="mx-2 my-1 px-2 py-1 border-b-orange-100">{flightDetail.flightNumber}</td>
-                                <td className="mx-2 my-1 px-2 py-1 border-b-orange-100">{flightDetail.airplane.name}</td>
-                                <td className="mx-2 my-1 px-2 py-1 border-b-orange-100">{flightDetail.airline.name}</td>
-                                <td className="mx-2 my-1 px-2 py-1 border-b-orange-100">{flightDetail.airport.name}</td>
-                                <td className="mx-2 my-1 px-2 py-1 border-b-orange-100">{flightDetail.status}</td>
-                            </tr> 
-                        )
-                    })
-                }
+              {flightDetailsList.length ? (
+                flightDetailsList
+                  .slice(startIndex, endIndex)
+                  .map((flightDetail, index) => (
+                    <tr key={index}>
+                      <td className="mx-2 my-1 px-2 py-1 border-b border-orange-100">
+                        {flightDetail.flightNumber}
+                      </td>
+                      <td className="mx-2 my-1 px-2 py-1 border-b border-orange-100">
+                        {flightDetail.airplane.name}
+                      </td>
+                      <td className="mx-2 my-1 px-2 py-1 border-b border-orange-100">
+                        {flightDetail.airline.name}
+                      </td>
+                      <td className="mx-2 my-1 px-2 py-1 border-b border-orange-100">
+                        {flightDetail.airport.name}
+                      </td>
+                      <td className="mx-2 my-1 px-2 py-1 border-b border-orange-100">
+                        {getFlightStatus(flightDetail.status)}
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan={5}> 
+                    <p className="text-center m-auto font-bold">No Data Found</p>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-        <div id="footerDiv" className="relative ">
-          <div id="selectBox">
-            <select>
+        <div className="relative mt-auto p-2 flex justify-between items-center">
+          <div className="flex items-center">
+            <label htmlFor="itemsPerPage" className="mr-2">
+              Items per page:
+            </label>
+            <select
+              id="itemsPerPage"
+              className="border-2 border-black rounded-md outline-none p-1"
+              onChange={(e) => handleItemChange(e.target.value)}
+            >
+              <option value={5}>5</option>
               <option value={10}>10</option>
               <option value={20}>20</option>
               <option value={30}>30</option>
@@ -70,9 +143,19 @@ const DataTable = () => {
               <option value={50}>50</option>
             </select>
           </div>
-          <div id="arrowButton" className="align-top">
-            <button id="previousPage">{"<"}</button>
-            <button id="nextPage">{">"}</button>
+          <div className="flex items-center">
+            <button
+              id="previousPage"
+              className="bg-purple-500 text-white p-2 rounded-md mx-1"
+            >
+              {"<"}
+            </button>
+            <button
+              id="nextPage"
+              className="bg-purple-500 text-white p-2 rounded-md mx-1"
+            >
+              {">"}
+            </button>
           </div>
         </div>
       </div>
