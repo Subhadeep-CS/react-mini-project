@@ -5,8 +5,6 @@ export const generateMockAirlineData = (numItems = 10) => {
     const statuses = ['On Time', 'Delayed', 'Cancelled', 'Boarding', 'Departed', 'Landed'];
     const mockData = [];
     for (let i = 0; i < numItems; i++) {
-        const departureTime = faker.date.future();
-        const arrivalTime = faker.date.future();
         mockData.push({
             flightNumber:faker.airline.flightNumber({length: 4}),
             airline:faker.airline.airline(),

@@ -16,6 +16,7 @@ const DataTable = () => {
 
   useEffect(() => {
     const airlineData = generateMockAirlineData(100);
+    console.log(airlineData);
     setFlightDetailsList([...airlineData]);
     setCopyFlightDeatilsList([...airlineData]);
   }, []);
