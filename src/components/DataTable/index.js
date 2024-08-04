@@ -48,7 +48,13 @@ const DataTable = () => {
 
   // Handle search text change
   const handleSearchChange = (searchText) => {
-    setSearchText(searchText);
+    if(searchText){
+      setSearchText(searchText);
+    }
+    else{
+      setSearchText("");
+      setFlightDetailsList([...copyFlightDetailsList]);
+    }
   };
 
   // Handle search click

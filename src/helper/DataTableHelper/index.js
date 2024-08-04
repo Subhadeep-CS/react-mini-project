@@ -22,7 +22,6 @@ const buttonStyle={'margin':'2px','padding':'2px','boxSizing':'border-box','opac
 
 export const getFlightStatus=(flightStatus)=>{
     const status=flightStatus;
-    console.log(flightStatus);
     switch(status){
         case "On Time":
             return <Button backgroundColor='green' name="On Time" height='30px' width='100px' cssStyle={buttonStyle}/>
