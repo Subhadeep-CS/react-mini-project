@@ -1,15 +1,15 @@
-import { Route, Router } from "react-router-dom";
-import DataTable from "./components/DataTable";
-
+import { Route, Router, Routes } from "react-router-dom";
+import Layout from "./Layout/Layout";
+import Home from "./pages/Home";
+import ProjectDetails from "./pages/ProjectDetails";
 function App() {
   return (
-    <div className='App'>
-      {/* <Router>
-        <Route>
-          
-        </Route>
-      </Router> */}
-      <DataTable/>
+    <div className="App">
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </Layout>
     </div>
   );
 }
